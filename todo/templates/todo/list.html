@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>Todo App</title>
+</head>
+<body>
+    <div class="todo-container">
+        <h2>Todo App</h2>
+
+        <!-- add task -->
+         <form method="POST">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" name="title" placeholder="Add your new todo" required>
+                <button type="submit" name="add_task" class="add-btn">
+                    <i data-lucide="plus"></i>
+                </button>
+            </div>
+         </form>
+        
+         <!-- task list -->
+          {% for todo in todos %}
+          <div class="task">
+            <div id="text-{{ todo.id }}" class="task-text">
+                {{ todo.title }}
+            </div>
+
+            <form method="POST" id="edit-{{ todo.id }}" class="edit-form" style="display: none;">
+                {% csrf_token %}
+                <input type="hidden" name="task_id" value="{{ todo.id }}">
+                <input type="text"
+                        name="new_title"
+                        value="{{ todo.title }}"
+                        class="edit-input"
+                        required>
+                <button type="submit"
+                        name="edit_task"
+                        class="btn btn-save">
+                    <i data-lucide="check"></i>
+                </button>
+            </form>
+
+            <!-- buttons -->
+             <div class="btn-group">
+                <button type="button" class="btn btn-edit" data-task-id="{{ todo.id }}">
+                    <i data-lucide="pencil"></i>
+                </button>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_id" value="{{ todo.id }}">
+                    <button type="submit" name="delete_task" class="btn btn-delete">
+                        <i data-lucide="trash"></i>
+                    </button>
+                </form>
+             </div>
+          </div>
+          {% empty %}
+            <p>No tasks yet</p>
+          {% endfor %}
+
+          <!-- footer -->
+           <div class="footer">
+                <span>You have {{ task_count }} tasks</span>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="clear_all" class="clear-btn">
+                        Clear All
+                    </button>
+                </form>
+           </div>
+    </div>
+
+    <script>
+    document.querySelectorAll('.btn-edit').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var id = this.dataset.taskId;
+            document.getElementById("text-" + id).style.display = "none";
+            document.getElementById("edit-" + id).style.display = "flex";
+        });
+    });
+    </script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+    lucide.createIcons();
+    </script>
+</body>
+</html>
